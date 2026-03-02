@@ -38,6 +38,9 @@ class OpenClawProvider(Protocol):
     def api_usage(self) -> dict[str, Any]:
         """Return API usage statistics."""
 
+    def ai_status(self) -> dict[str, Any]:
+        """Return AI developer's real-time status."""
+
 
 @dataclass
 class MockOpenClawProvider:
@@ -221,6 +224,12 @@ class OpenClawAPI:
             "progress": 0,
             "last_update": now,
             "activity_log": [],
+            "ai_state": {
+                "state": "idle",
+                "description": "空闲",
+                "updated_at": now,
+                "details": "",
+            },
             "api_usage": {
                 "today_calls": 0,
                 "token_input": 0,
@@ -518,6 +527,56 @@ class OpenClawAPI:
             "openclaw_api": self._collect_openclaw_usage(state),
         }
 
+    def get_ai_status(self) -> dict[str, Any]:
+        """获取 AI 开发者实时状态。"""
+        state = self._ensure_state_file()
+        ai_state = state.get("ai_state")
+        
+        if not isinstance(ai_state, dict):
+            ai_state = {
+                "state": "idle",
+                "description": "空闲",
+                "updated_at": self._now_iso(),
+                "details": "",
+            }
+        
+        return {
+            "state": ai_state.get("state", "idle"),
+            "description": ai_state.get("description", "空闲"),
+            "updated_at": ai_state.get("updated_at"),
+            "details": ai_state.get("details", ""),
+            "current_task": state.get("current_task", "暂无任务"),
+            "progress": state.get("progress", 0),
+        }
+
+    def update_ai_status(self, state: str, description: str, details: str = "", task: str = "", progress: int = 0) -> dict[str, Any]:
+        """更新 AI 开发者状态。"""
+        state_path = self._state_file_path()
+        
+        try:
+            data = json.loads(state_path.read_text(encoding="utf-8"))
+            if not isinstance(data, dict):
+                data = self._default_state()
+        except Exception:
+            data = self._default_state()
+        
+        now = self._now_iso()
+        data["ai_state"] = {
+            "state": state,
+            "description": description,
+            "updated_at": now,
+            "details": details,
+        }
+        
+        if task:
+            data["current_task"] = task
+        if progress:
+            data["progress"] = progress
+        data["last_update"] = now
+        
+        state_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        return data.get("ai_state")
+
     def get_sessions(self) -> list[dict[str, Any]]:
         """获取活跃会话列表。"""
         sessions = self._provider_call("sessions_list", [])
@@ -648,3 +707,13 @@ def get_recent_activity() -> list[dict[str, Any]]:
 def get_metrics() -> dict[str, Any]:
     """获取性能指标。"""
     return _default_api.get_metrics()
+
+
+def get_ai_status() -> dict[str, Any]:
+    """获取 AI 开发者实时状态。"""
+    return _default_api.get_ai_status()
+
+
+def update_ai_status(state: str, description: str, details: str = "", task: str = "", progress: int = 0) -> dict[str, Any]:
+    """更新 AI 开发者状态。"""
+    return _default_api.update_ai_status(state, description, details, task, progress)

@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .openclaw_api import (
+    get_ai_status,
     get_config,
     get_metrics,
     get_recent_activity,
@@ -15,6 +16,7 @@ from .openclaw_api import (
     get_status,
     get_usage,
     get_work_status,
+    update_ai_status,
 )
 
 app = FastAPI(title="OpenClaw Dashboard")
@@ -85,3 +87,13 @@ async def status_data() -> dict[str, Any]:
 @app.get("/api/usage")
 async def usage_data() -> dict[str, Any]:
     return get_usage()
+
+
+@app.get("/api/ai-status")
+async def ai_status_data() -> dict[str, Any]:
+    return get_ai_status()
+
+
+@app.post("/api/ai-status")
+async def update_ai_status_data(state: str, description: str, details: str = "", task: str = "", progress: int = 0) -> dict[str, Any]:
+    return update_ai_status(state, description, details, task, progress)

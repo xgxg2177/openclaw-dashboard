@@ -264,9 +264,15 @@
       <div class="board">
         <div class="header">
           <h1 class="title">OpenClaw Dashboard</h1>
-          <div class="status-chip">
-            <span class="dot" id="status-dot"></span>
-            <span id="header-status">在线</span>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div class="status-chip" id="ai-status-chip" style="background:#e3f2fd;color:#0d47a1;border-color:#90caf9">
+              <span class="dot" id="ai-status-dot" style="background:#2196f3"></span>
+              <span id="ai-status-text">空闲</span>
+            </div>
+            <div class="status-chip">
+              <span class="dot" id="status-dot"></span>
+              <span id="header-status">在线</span>
+            </div>
           </div>
         </div>
 
@@ -393,7 +399,24 @@
         return '$' + num.toFixed(2);
       }
 
-      function updateUI(data, status, usage) {
+      function updateUI(data, status, usage, aiStatus) {
+        // AI 状态
+        const aiStateMap = {
+          'thinking': { icon: '🧠', text: '思考中', color: '#9c27b0' },
+          'using_tool': { icon: '🛠️', text: '使用工具', color: '#ff9800' },
+          'calling_codex': { icon: '🤖', text: '调用 Codex', color: '#2196f3' },
+          'generating': { icon: '✍️', text: '生成内容', color: '#4caf50' },
+          'reviewing': { icon: '🔍', text: '审查代码', color: '#ff5722' },
+          'committing': { icon: '📝', text: '提交代码', color: '#79554a' },
+          'idle': { icon: '✅', text: '空闲', color: '#9e9e9e' },
+        };
+        const aiConfig = aiStateMap[aiStatus.state] || aiStateMap['idle'];
+        document.getElementById('ai-status-text').textContent = `${aiConfig.icon} ${aiConfig.text}`;
+        document.getElementById('ai-status-dot').style.background = aiConfig.color;
+        document.getElementById('ai-status-chip').style.background = `${aiConfig.color}15`;
+        document.getElementById('ai-status-chip').style.color = aiConfig.color;
+        document.getElementById('ai-status-chip').style.borderColor = `${aiConfig.color}40`;
+
         // 顶部卡片
         document.getElementById('card-status').textContent = data.status === 'online' ? '在线' : '离线';
         document.getElementById('card-task').textContent = data.current_task || '暂无任务';
@@ -499,24 +522,26 @@
 
       async function fetchData() {
         try {
-          const [dashboardRes, statusRes, usageRes] = await Promise.all([
+          const [dashboardRes, statusRes, usageRes, aiStatusRes] = await Promise.all([
             fetch('/api/dashboard'),
             fetch('/api/status'),
-            fetch('/api/usage')
+            fetch('/api/usage'),
+            fetch('/api/ai-status')
           ]);
 
-          if (!dashboardRes.ok || !statusRes.ok || !usageRes.ok) {
+          if (!dashboardRes.ok || !statusRes.ok || !usageRes.ok || !aiStatusRes.ok) {
             throw new Error('API error');
           }
 
           const dashboard = await dashboardRes.json();
           const status = await statusRes.json();
           const usage = await usageRes.json();
+          const aiStatus = await aiStatusRes.json();
 
           document.getElementById('error-box').style.display = 'none';
           document.querySelector('.board').classList.remove('loading');
           
-          updateUI(dashboard, status, usage);
+          updateUI(dashboard, status, usage, aiStatus);
         } catch (err) {
           console.error('Fetch error:', err);
           document.getElementById('error-box').style.display = 'block';
