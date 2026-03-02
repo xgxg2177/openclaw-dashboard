@@ -1,10 +1,11 @@
 from pathlib import Path
+from typing import Union
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from openclaw_api import get_sessions, get_skills, get_status
+from .openclaw_api import get_sessions, get_skills, get_status
 
 app = FastAPI(title="OpenClaw Dashboard")
 
@@ -27,7 +28,7 @@ async def health() -> dict[str, str]:
 
 
 @app.get("/api/dashboard")
-async def dashboard_data() -> dict[str, str | int]:
+async def dashboard_data() -> dict[str, Union[str, int]]:
     status_data = get_status()
     sessions = get_sessions()
     skills = get_skills()
