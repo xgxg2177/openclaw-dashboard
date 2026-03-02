@@ -85,6 +85,12 @@
         height: 10px;
         border-radius: 50%;
         background: var(--ok);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
       }
 
       .cards {
@@ -98,592 +104,425 @@
         border: 1px solid var(--line);
         border-radius: 14px;
         padding: 12px;
-        background: linear-gradient(135deg, var(--panel-soft), #ffffff);
+        background: var(--panel);
       }
 
       .card-label {
-        font-size: 12px;
+        font-size: 11px;
         color: var(--muted);
-        margin-bottom: 8px;
+        margin-bottom: 4px;
       }
 
       .card-value {
-        font-family: "Space Grotesk", sans-serif;
-        font-size: 22px;
-        line-height: 1.15;
-        word-break: break-word;
+        font-size: 16px;
+        font-weight: 700;
+        font-family: "Space Grotesk", monospace;
       }
 
-      .section-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-bottom: 12px;
+      .card-value.small {
+        font-size: 13px;
       }
 
-      .panel {
+      .section {
         border: 1px solid var(--line);
         border-radius: 14px;
         padding: 14px;
-        background: #fff;
+        background: var(--panel);
+        margin-bottom: 12px;
       }
 
-      .panel h2 {
-        margin: 0 0 10px;
-        font-family: "Space Grotesk", sans-serif;
-        font-size: 18px;
+      .section-title {
+        font-size: 14px;
+        font-weight: 700;
+        margin: 0 0 10px 0;
+        color: var(--muted);
       }
 
-      .list {
+      .grid-2 {
         display: grid;
-        gap: 8px;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
       }
 
-      .row {
-        border: 1px solid #e6ebdf;
+      .item {
+        border: 1px solid var(--line);
         border-radius: 10px;
         padding: 10px;
-        background: #fcfdfb;
+        background: var(--panel-soft);
       }
 
-      .row-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-        align-items: center;
-        margin-bottom: 6px;
-      }
-
-      .row-title {
-        margin: 0;
-        font-size: 15px;
+      .item-title {
+        font-size: 13px;
         font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .item-meta {
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.5;
       }
 
       .tag {
-        border-radius: 999px;
+        display: inline-block;
         padding: 2px 8px;
-        font-size: 12px;
-        white-space: nowrap;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
       }
 
       .tag.active {
-        background: #daf1d9;
-        color: #1f6932;
+        background: #d4edda;
+        color: #155724;
       }
 
       .tag.idle {
-        background: #f3f2d5;
-        color: #7a6f20;
+        background: #fff3cd;
+        color: #856404;
       }
 
-      .tag.loaded {
-        background: #daf1d9;
-        color: #1f6932;
+      .tag.inactive {
+        background: #f8d7da;
+        color: #721c24;
       }
 
-      .tag.unloaded {
-        background: #f8ddcf;
-        color: #8b4428;
+      .log-item {
+        border-left: 3px solid var(--line);
+        padding-left: 10px;
+        margin-bottom: 10px;
       }
 
-      .meta {
-        margin: 2px 0;
-        font-size: 12px;
+      .log-time {
+        font-size: 10px;
         color: var(--muted);
       }
 
-      .activity .row {
-        display: grid;
-        grid-template-columns: 84px 1fr;
-        gap: 8px;
-        align-items: start;
-      }
-
-      .time {
-        font-family: "Space Grotesk", sans-serif;
+      .log-content {
         font-size: 12px;
-        color: #4a5a38;
+        margin-top: 2px;
       }
 
-      .hint {
+      .footer {
         text-align: right;
-        margin-top: 10px;
+        font-size: 10px;
         color: var(--muted);
+        margin-top: 14px;
+      }
+
+      .refresh-info {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .refresh-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--ok);
+        display: inline-block;
+        margin-right: 4px;
+      }
+
+      .usage-bar {
+        height: 6px;
+        background: #e9ecef;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 6px;
+      }
+
+      .usage-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #2a8f44, #5cb85c);
+        border-radius: 3px;
+        transition: width 0.3s;
+      }
+
+      .error-box {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 8px;
         font-size: 12px;
+        display: none;
       }
 
-      @media (max-width: 1000px) {
-        .cards {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-      }
-
-      @media (max-width: 760px) {
-        .board {
-          padding: 14px;
-          border-radius: 16px;
-        }
-
-        .header {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        .title {
-          font-size: 24px;
-        }
-
-        .cards {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .section-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .activity .row {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      @media (max-width: 420px) {
-        .cards {
-          grid-template-columns: 1fr;
-        }
+      .loading {
+        opacity: 0.6;
+        pointer-events: none;
       }
     </style>
   </head>
   <body>
-    <main class="container">
-      <section class="board">
-        <header class="header">
-          <h1 class="title">{{ title }}</h1>
+    <div class="container">
+      <div class="board">
+        <div class="header">
+          <h1 class="title">OpenClaw Dashboard</h1>
           <div class="status-chip">
-            <span id="header-dot" class="dot"></span>
+            <span class="dot" id="status-dot"></span>
             <span id="header-status">在线</span>
           </div>
-        </header>
+        </div>
 
-        <section class="cards">
-          <article class="card">
+        <div class="refresh-info">
+          <span><span class="refresh-dot"></span>自动刷新 5 秒</span>
+          <span id="last-update">更新于 --:--:--</span>
+        </div>
+
+        <div class="error-box" id="error-box">
+          ⚠️ 数据加载失败，请刷新页面重试
+        </div>
+
+        <div class="cards" id="cards">
+          <div class="card">
             <div class="card-label">状态</div>
-            <div id="card-status" class="card-value">加载中...</div>
-          </article>
-          <article class="card">
+            <div class="card-value" id="card-status">--</div>
+          </div>
+          <div class="card">
             <div class="card-label">任务</div>
-            <div id="card-task" class="card-value">加载中...</div>
-          </article>
-          <article class="card">
+            <div class="card-value small" id="card-task">--</div>
+          </div>
+          <div class="card">
             <div class="card-label">会话</div>
-            <div id="card-sessions" class="card-value">0 / 0</div>
-          </article>
-          <article class="card">
+            <div class="card-value" id="card-sessions">--</div>
+          </div>
+          <div class="card">
             <div class="card-label">技能</div>
-            <div id="card-skills" class="card-value">0 / 0</div>
-          </article>
-          <article class="card">
+            <div class="card-value" id="card-skills">--</div>
+          </div>
+          <div class="card">
             <div class="card-label">Token</div>
-            <div id="card-token" class="card-value">0 / 0</div>
-          </article>
-          <article class="card">
+            <div class="card-value small" id="card-token">--</div>
+            <div class="usage-bar"><div class="usage-fill" id="token-bar" style="width:0%"></div></div>
+          </div>
+          <div class="card">
             <div class="card-label">模型</div>
-            <div id="card-model" class="card-value">-</div>
-          </article>
-          <article class="card">
-            <div class="card-label">开始时间</div>
-            <div id="card-started-at" class="card-value">-</div>
-          </article>
-          <article class="card">
-            <div class="card-label">进度</div>
-            <div id="card-progress" class="card-value">0%</div>
-          </article>
-        </section>
+            <div class="card-value small" id="card-model">--</div>
+          </div>
+        </div>
 
-        <section class="section-grid">
-          <article class="panel">
-            <h2>工作状态</h2>
-            <div class="list">
-              <div class="row">
-                <p class="meta">当前状态: <strong id="work-status">-</strong></p>
-                <p class="meta">当前任务: <strong id="work-task">-</strong></p>
-                <p class="meta">开始时间: <span id="work-started-at">-</span></p>
-                <p class="meta">任务进度: <span id="work-progress">0%</span></p>
-                <p class="meta">最后更新: <span id="work-last-update">-</span></p>
+        <div class="grid-2">
+          <div class="section">
+            <h3 class="section-title">工作状态</h3>
+            <div class="item">
+              <div class="item-meta">
+                <div><strong>当前状态:</strong> <span id="work-status">--</span></div>
+                <div><strong>当前任务:</strong> <span id="work-task">--</span></div>
+                <div><strong>开始时间:</strong> <span id="work-start">--</span></div>
+                <div><strong>任务进度:</strong> <span id="work-progress">--</span></div>
+                <div><strong>最后更新:</strong> <span id="work-update">--</span></div>
               </div>
             </div>
-            <div id="work-activity-list" class="list"></div>
-          </article>
+            <div style="margin-top:10px">
+              <div class="section-title" style="margin-bottom:6px">活动日志</div>
+              <div id="activity-log" style="font-size:11px;color:var(--muted)">暂无活动日志</div>
+            </div>
+          </div>
 
-          <article class="panel">
-            <h2>用量统计</h2>
-            <div class="list">
-              <div class="row">
-                <p class="meta"><strong>Codex CLI</strong></p>
-                <p class="meta">今日会话: <span id="codex-sessions">0</span></p>
-                <p class="meta">今日 Token: <span id="codex-tokens">0</span></p>
-                <p class="meta">Rate Limit: <span id="codex-rate-limit">-</span></p>
-              </div>
-              <div class="row">
-                <p class="meta"><strong>OpenClaw API</strong></p>
-                <p class="meta">今日调用: <span id="api-calls">0</span></p>
-                <p class="meta">输入 Token: <span id="api-token-in">0</span></p>
-                <p class="meta">输出 Token: <span id="api-token-out">0</span></p>
-                <p class="meta">成本: $<span id="api-cost">0.000000</span></p>
+          <div class="section">
+            <h3 class="section-title">用量统计</h3>
+            <div class="item" style="margin-bottom:8px">
+              <div class="item-title">Codex CLI</div>
+              <div class="item-meta">
+                <div>今日会话：<span id="codex-sessions">--</span></div>
+                <div>今日 Token: <span id="codex-tokens">--</span></div>
+                <div>Rate Limit: <span id="codex-limit">--</span></div>
               </div>
             </div>
-            <div id="usage-recent-list" class="list"></div>
-          </article>
-        </section>
+            <div class="item" style="margin-bottom:8px">
+              <div class="item-title">OpenClaw API</div>
+              <div class="item-meta">
+                <div>今日调用：<span id="api-calls">--</span></div>
+                <div>输入 Token: <span id="api-input">--</span></div>
+                <div>输出 Token: <span id="api-output">--</span></div>
+                <div>成本：<span id="api-cost">--</span></div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="section-title" style="margin-bottom:6px">最近调用</div>
+              <div id="recent-calls" style="font-size:10px;max-height:150px;overflow-y:auto"></div>
+            </div>
+          </div>
+        </div>
 
-        <section class="section-grid">
-          <article class="panel">
-            <h2>会话列表</h2>
-            <div id="sessions-list" class="list"></div>
-          </article>
+        <div class="section">
+          <h3 class="section-title">会话列表</h3>
+          <div id="sessions-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px"></div>
+        </div>
 
-          <article class="panel">
-            <h2>技能列表</h2>
-            <div id="skills-list" class="list"></div>
-          </article>
-        </section>
+        <div class="section">
+          <h3 class="section-title">技能列表</h3>
+          <div id="skills-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px"></div>
+        </div>
 
-        <section class="panel activity">
-          <h2>最近活动日志</h2>
-          <div id="activity-list" class="list"></div>
-        </section>
+        <div class="section">
+          <h3 class="section-title">最近活动日志</h3>
+          <div id="recent-activity" style="font-size:11px"></div>
+        </div>
 
-        <p class="hint">
-          版本 <span id="version">-</span> · 运行时长 <span id="runtime">-</span> · 请求成功率
-          <span id="success-rate">0%</span> · 响应时间 <span id="response-time">0ms</span> · 自动刷新
-          <span id="refresh-time">--:--:--</span>
-        </p>
-      </section>
-    </main>
+        <div class="footer" id="footer">
+          版本 v0.4.2 · 自动刷新中
+        </div>
+      </div>
+    </div>
 
     <script>
-      const els = {
-        headerStatus: document.getElementById("header-status"),
-        headerDot: document.getElementById("header-dot"),
-        status: document.getElementById("card-status"),
-        task: document.getElementById("card-task"),
-        sessions: document.getElementById("card-sessions"),
-        skills: document.getElementById("card-skills"),
-        token: document.getElementById("card-token"),
-        model: document.getElementById("card-model"),
-        startedAt: document.getElementById("card-started-at"),
-        progress: document.getElementById("card-progress"),
-        workStatus: document.getElementById("work-status"),
-        workTask: document.getElementById("work-task"),
-        workStartedAt: document.getElementById("work-started-at"),
-        workProgress: document.getElementById("work-progress"),
-        workLastUpdate: document.getElementById("work-last-update"),
-        workActivityList: document.getElementById("work-activity-list"),
-        codexSessions: document.getElementById("codex-sessions"),
-        codexTokens: document.getElementById("codex-tokens"),
-        codexRateLimit: document.getElementById("codex-rate-limit"),
-        apiCalls: document.getElementById("api-calls"),
-        apiTokenIn: document.getElementById("api-token-in"),
-        apiTokenOut: document.getElementById("api-token-out"),
-        apiCost: document.getElementById("api-cost"),
-        usageRecentList: document.getElementById("usage-recent-list"),
-        version: document.getElementById("version"),
-        runtime: document.getElementById("runtime"),
-        successRate: document.getElementById("success-rate"),
-        responseTime: document.getElementById("response-time"),
-        refreshTime: document.getElementById("refresh-time"),
-        sessionsList: document.getElementById("sessions-list"),
-        skillsList: document.getElementById("skills-list"),
-        activityList: document.getElementById("activity-list"),
-      };
-
-      function formatTime(date) {
-        return date.toLocaleTimeString("zh-CN", { hour12: false });
+      function formatTime(iso) {
+        if (!iso) return '--';
+        const d = new Date(iso);
+        return d.toLocaleString('zh-CN', { 
+          year: 'numeric', 
+          month: '2-digit', 
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
       }
 
-      function formatDateTime(value) {
-        if (!value) return "-";
-        const parsed = new Date(value);
-        if (Number.isNaN(parsed.valueOf())) return String(value);
-        return parsed.toLocaleString("zh-CN", { hour12: false });
+      function formatNumber(num) {
+        return num.toLocaleString('zh-CN');
       }
 
-      function formatRuntime(seconds) {
-        const total = Math.max(Number(seconds || 0), 0);
-        const h = Math.floor(total / 3600);
-        const m = Math.floor((total % 3600) / 60);
-        const s = total % 60;
-        return `${h}h ${m}m ${s}s`;
+      function formatCurrency(num) {
+        return '$' + num.toFixed(2);
       }
 
-      function setStatus(status) {
-        const normalized = String(status || "idle").toLowerCase();
-        const statusMap = {
-          online: "在线",
-          offline: "离线",
-          working: "工作中",
-          idle: "空闲",
-          thinking: "思考中",
-          executing: "执行中",
-        };
-        const colorMap = {
-          online: "var(--ok)",
-          offline: "var(--warn)",
-          working: "var(--ok)",
-          idle: "var(--idle)",
-          thinking: "#2f7596",
-          executing: "#2d5baa",
-        };
-        const text = statusMap[normalized] || "空闲";
-        els.headerStatus.textContent = text;
-        els.status.textContent = text;
-        els.workStatus.textContent = text;
-        els.headerDot.style.background = colorMap[normalized] || "var(--idle)";
-      }
+      function updateUI(data, status, usage) {
+        // 顶部卡片
+        document.getElementById('card-status').textContent = data.status === 'online' ? '在线' : '离线';
+        document.getElementById('card-task').textContent = data.current_task || '暂无任务';
+        document.getElementById('card-sessions').textContent = `${data.summary.active_sessions}/${data.summary.total_sessions}`;
+        document.getElementById('card-skills').textContent = `${data.summary.loaded_skills}/${data.summary.total_skills}`;
+        
+        const tokenPct = ((data.token_usage.used / data.token_usage.limit) * 100).toFixed(1);
+        document.getElementById('card-token').textContent = `${formatNumber(data.token_usage.used)} / ${formatNumber(data.token_usage.limit)}`;
+        document.getElementById('token-bar').style.width = tokenPct + '%';
+        
+        document.getElementById('card-model').textContent = data.model;
 
-      function renderSessions(sessions) {
-        if (!Array.isArray(sessions) || sessions.length === 0) {
-          els.sessionsList.innerHTML = '<div class="meta">暂无会话数据</div>';
-          return;
+        // 工作状态
+        document.getElementById('work-status').textContent = status.status || '--';
+        document.getElementById('work-task').textContent = status.current_task || '--';
+        document.getElementById('work-start').textContent = formatTime(status.started_at);
+        document.getElementById('work-progress').textContent = (status.progress || 0) + '%';
+        document.getElementById('work-update').textContent = formatTime(status.last_update);
+
+        if (status.activity_log && status.activity_log.length > 0) {
+          document.getElementById('activity-log').innerHTML = status.activity_log.slice(0, 3).map(log => 
+            `<div style="margin-bottom:4px">• ${log}</div>`
+          ).join('');
         }
 
-        els.sessionsList.innerHTML = sessions
-          .map((session) => {
-            const sessionStatus = session.status === "active" ? "active" : "idle";
-            const statusText = sessionStatus === "active" ? "活跃" : "空闲";
-            return `
-              <article class="row">
-                <div class="row-head">
-                  <p class="row-title">${session.title || "Untitled Session"}</p>
-                  <span class="tag ${sessionStatus}">${statusText}</span>
-                </div>
-                <p class="meta">ID: ${session.id || "-"}</p>
-                <p class="meta">创建时间: ${formatDateTime(session.created_at)}</p>
-                <p class="meta">最后活动: ${formatDateTime(session.last_activity_at)}</p>
-                <p class="meta">消息数量: ${Number(session.message_count ?? 0)}</p>
-              </article>
-            `;
-          })
-          .join("");
-      }
-
-      function renderSkills(skills) {
-        if (!Array.isArray(skills) || skills.length === 0) {
-          els.skillsList.innerHTML = '<div class="meta">暂无技能数据</div>';
-          return;
+        // 用量统计
+        if (usage && usage.codex) {
+          document.getElementById('codex-sessions').textContent = formatNumber(usage.codex.today_sessions);
+          document.getElementById('codex-tokens').textContent = formatNumber(usage.codex.today_token_usage);
+          document.getElementById('codex-limit').textContent = (usage.codex.rate_limit_percent || 0).toFixed(1) + '%';
         }
 
-        els.skillsList.innerHTML = skills
-          .map((skill) => {
-            const loaded = Boolean(skill.loaded);
-            return `
-              <article class="row">
-                <div class="row-head">
-                  <p class="row-title">${skill.name || "unknown-skill"}</p>
-                  <span class="tag ${loaded ? "loaded" : "unloaded"}">${loaded ? "已加载" : "未加载"}</span>
-                </div>
-                <p class="meta">描述: ${skill.description || "No description"}</p>
-                <p class="meta">来源: ${skill.source || "builtin"}</p>
-              </article>
-            `;
-          })
-          .join("");
-      }
-
-      function renderActivity(activities) {
-        if (!Array.isArray(activities) || activities.length === 0) {
-          els.activityList.innerHTML = '<div class="meta">暂无活动日志</div>';
-          return;
+        if (usage && usage.openclaw_api) {
+          document.getElementById('api-calls').textContent = formatNumber(usage.openclaw_api.today_calls);
+          document.getElementById('api-input').textContent = formatNumber(usage.openclaw_api.token_input);
+          document.getElementById('api-output').textContent = formatNumber(usage.openclaw_api.token_output);
+          document.getElementById('api-cost').textContent = formatCurrency(usage.openclaw_api.cost_usd);
         }
 
-        els.activityList.innerHTML = activities
-          .map(
-            (item) => `
-            <article class="row">
-              <div class="time">${formatDateTime(item.timestamp)}</div>
-              <div>
-                <p class="meta"><strong>${item.type || "unknown"}</strong> · ${item.action || "unknown"}</p>
-                <p class="meta">${item.detail || ""}</p>
+        // 最近调用
+        if (usage && usage.codex && usage.codex.recent_calls) {
+          document.getElementById('recent-calls').innerHTML = usage.codex.recent_calls.slice(0, 5).map(call => {
+            const time = new Date(call.timestamp).toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'});
+            return `<div style="margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px">
+              <div style="color:#666">${time} · ${call.task.substring(0, 50)}...</div>
+              <div style="color:#999">Token: ${formatNumber(call.token_usage)}</div>
+            </div>`;
+          }).join('');
+        }
+
+        // 会话列表
+        if (data.sessions && data.sessions.length > 0) {
+          document.getElementById('sessions-list').innerHTML = data.sessions.map(s => `
+            <div class="item">
+              <div class="item-title">${s.title}</div>
+              <div class="item-meta">
+                <div>ID: ${s.id}</div>
+                <div>创建：${formatTime(s.created_at)}</div>
+                <div>最后活动：${formatTime(s.last_activity_at)}</div>
+                <div>消息数：${formatNumber(s.message_count)}</div>
+                <div style="margin-top:4px"><span class="tag ${s.status === 'active' ? 'active' : 'idle'}">${s.status === 'active' ? '活跃' : '空闲'}</span></div>
               </div>
-            </article>
-          `,
-          )
-          .join("");
-      }
-
-      function renderWorkActivity(activities) {
-        if (!Array.isArray(activities) || activities.length === 0) {
-          els.workActivityList.innerHTML = '<div class="meta">暂无工作活动日志</div>';
-          return;
+            </div>
+          `).join('');
         }
 
-        els.workActivityList.innerHTML = activities
-          .map(
-            (item) => `
-            <article class="row">
-              <p class="meta"><strong>${item.type || "info"}</strong> · ${formatDateTime(item.timestamp)}</p>
-              <p class="meta">${item.message || ""}</p>
-            </article>
-          `,
-          )
-          .join("");
-      }
-
-      function renderUsageRecent(codexCalls, apiCalls) {
-        const codexRows = Array.isArray(codexCalls) ? codexCalls.slice(0, 5) : [];
-        const apiRows = Array.isArray(apiCalls) ? apiCalls.slice(0, 5) : [];
-        const rows = [];
-
-        for (const item of codexRows) {
-          rows.push(`
-            <article class="row">
-              <p class="meta"><strong>Codex</strong> · ${formatDateTime(item.timestamp)}</p>
-              <p class="meta">${item.task || "tool_call"} · Token ${Number(item.token_usage || 0)}</p>
-            </article>
-          `);
+        // 技能列表
+        if (data.skills && data.skills.length > 0) {
+          document.getElementById('skills-list').innerHTML = data.skills.map(s => `
+            <div class="item">
+              <div class="item-title">${s.name}</div>
+              <div class="item-meta">
+                <div>描述：${s.description || '无'}</div>
+                <div>来源：${s.source || 'unknown'}</div>
+                <div style="margin-top:4px"><span class="tag ${s.loaded ? 'active' : 'inactive'}">${s.loaded ? '已加载' : '未加载'}</span></div>
+              </div>
+            </div>
+          `).join('');
         }
 
-        for (const item of apiRows) {
-          rows.push(`
-            <article class="row">
-              <p class="meta"><strong>OpenClaw API</strong> · ${formatDateTime(item.timestamp)}</p>
-              <p class="meta">${item.endpoint || "unknown"} · in ${Number(item.token_input || 0)} / out ${Number(item.token_output || 0)} · $${Number(item.cost_usd || 0).toFixed(6)}</p>
-            </article>
-          `);
+        // 活动日志
+        if (data.recent_activity && data.recent_activity.length > 0) {
+          document.getElementById('recent-activity').innerHTML = data.recent_activity.map(log => `
+            <div class="log-item">
+              <div class="log-time">${formatTime(log.timestamp)}</div>
+              <div class="log-content">${log.task}</div>
+            </div>
+          `).join('');
         }
 
-        if (rows.length === 0) {
-          els.usageRecentList.innerHTML = '<div class="meta">暂无调用记录</div>';
-          return;
-        }
-
-        els.usageRecentList.innerHTML = rows.join("");
+        // 更新时间
+        const now = new Date();
+        document.getElementById('last-update').textContent = `更新于 ${now.toLocaleTimeString('zh-CN')}`;
+        
+        // 页脚
+        document.getElementById('footer').textContent = `版本 v0.4.2 · 运行时长 ${data.runtime_seconds || 0}s · 请求成功率 ${data.metrics?.request_success_rate || 0}% · 响应时间 ${data.metrics?.response_time_ms || 0}ms · 自动刷新 ${now.toLocaleTimeString('zh-CN')}`;
       }
 
-      function renderWorkStatus(data) {
-        const progressValue = Number(data.progress ?? 0);
-        const progress = Number.isFinite(progressValue) ? Math.max(0, Math.min(100, progressValue)) : 0;
-        setStatus(data.status || "idle");
-        els.task.textContent = data.current_task || "暂无任务";
-        els.workTask.textContent = data.current_task || "暂无任务";
-        els.startedAt.textContent = formatDateTime(data.started_at);
-        els.progress.textContent = `${progress}%`;
-        els.workStartedAt.textContent = formatDateTime(data.started_at);
-        els.workProgress.textContent = `${progress}%`;
-        els.workLastUpdate.textContent = formatDateTime(data.last_update);
-        renderWorkActivity(data.activity_log || []);
-      }
-
-      function renderUsage(data) {
-        const codex = data.codex || {};
-        const api = data.openclaw_api || {};
-        const rate = codex.rate_limit || {};
-        const rateText =
-          rate.primary_used_percent == null ? "-" : `${Number(rate.primary_used_percent || 0).toFixed(1)}%`;
-
-        els.codexSessions.textContent = `${Number(codex.today_sessions ?? 0)}`;
-        els.codexTokens.textContent = `${Number(codex.today_token_usage ?? 0)}`;
-        els.codexRateLimit.textContent = rateText;
-        els.apiCalls.textContent = `${Number(api.today_calls ?? 0)}`;
-        els.apiTokenIn.textContent = `${Number(api.token_input ?? 0)}`;
-        els.apiTokenOut.textContent = `${Number(api.token_output ?? 0)}`;
-        els.apiCost.textContent = Number(api.cost_usd ?? 0).toFixed(6);
-
-        renderUsageRecent(codex.recent_calls || [], api.recent_calls || []);
-      }
-
-      async function fetchJson(url) {
-        const res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-        return res.json();
-      }
-
-      function resetOnError() {
-        setStatus("offline");
-        els.task.textContent = "数据获取失败";
-        els.workTask.textContent = "数据获取失败";
-        els.sessions.textContent = "0 / 0";
-        els.skills.textContent = "0 / 0";
-        els.token.textContent = "0 / 0";
-        els.model.textContent = "-";
-        els.startedAt.textContent = "-";
-        els.progress.textContent = "0%";
-        els.workStartedAt.textContent = "-";
-        els.workProgress.textContent = "0%";
-        els.workLastUpdate.textContent = "-";
-        els.version.textContent = "-";
-        els.runtime.textContent = "-";
-        els.successRate.textContent = "0%";
-        els.responseTime.textContent = "0ms";
-        els.codexSessions.textContent = "0";
-        els.codexTokens.textContent = "0";
-        els.codexRateLimit.textContent = "-";
-        els.apiCalls.textContent = "0";
-        els.apiTokenIn.textContent = "0";
-        els.apiTokenOut.textContent = "0";
-        els.apiCost.textContent = "0.000000";
-        renderSessions([]);
-        renderSkills([]);
-        renderActivity([]);
-        renderWorkActivity([]);
-        renderUsageRecent([], []);
-      }
-
-      async function refreshDashboard() {
+      async function fetchData() {
         try {
-          const [dashboardResult, statusResult, usageResult] = await Promise.allSettled([
-            fetchJson("/api/dashboard"),
-            fetchJson("/api/status"),
-            fetchJson("/api/usage"),
+          const [dashboardRes, statusRes, usageRes] = await Promise.all([
+            fetch('/api/dashboard'),
+            fetch('/api/status'),
+            fetch('/api/usage')
           ]);
 
-          const dashboardData = dashboardResult.status === "fulfilled" ? dashboardResult.value : null;
-          const statusData = statusResult.status === "fulfilled" ? statusResult.value : null;
-          const usageData = usageResult.status === "fulfilled" ? usageResult.value : null;
-
-          if (!dashboardData && !statusData && !usageData) {
-            throw new Error("All API requests failed");
+          if (!dashboardRes.ok || !statusRes.ok || !usageRes.ok) {
+            throw new Error('API error');
           }
 
-          if (statusData) {
-            renderWorkStatus(statusData);
-          } else if (dashboardData) {
-            setStatus(dashboardData.status || "online");
-          }
+          const dashboard = await dashboardRes.json();
+          const status = await statusRes.json();
+          const usage = await usageRes.json();
 
-          if (dashboardData) {
-            const summary = dashboardData.summary || {};
-            const tokenUsage = dashboardData.token_usage || {};
-            const metrics = dashboardData.metrics || {};
-
-            els.sessions.textContent = `${summary.active_sessions ?? 0} / ${summary.total_sessions ?? 0}`;
-            els.skills.textContent = `${summary.loaded_skills ?? 0} / ${summary.total_skills ?? 0}`;
-            els.token.textContent = `${tokenUsage.used ?? 0} / ${tokenUsage.limit ?? 0}`;
-            els.model.textContent = dashboardData.model || "unknown";
-            els.version.textContent = dashboardData.version || "v0.0.0";
-            els.runtime.textContent = formatRuntime(dashboardData.runtime_seconds || 0);
-            els.successRate.textContent = `${Number(metrics.request_success_rate ?? 0).toFixed(1)}%`;
-            els.responseTime.textContent = `${Number(metrics.response_time_ms ?? 0)}ms`;
-
-            renderSessions(dashboardData.sessions || []);
-            renderSkills(dashboardData.skills || []);
-            renderActivity(dashboardData.recent_activity || []);
-          }
-
-          if (usageData) {
-            renderUsage(usageData);
-          }
-
-          els.refreshTime.textContent = formatTime(new Date());
-        } catch (error) {
-          resetOnError();
-          els.refreshTime.textContent = `${formatTime(new Date())} (错误)`;
-          console.error("Failed to refresh dashboard:", error);
+          document.getElementById('error-box').style.display = 'none';
+          document.querySelector('.board').classList.remove('loading');
+          
+          updateUI(dashboard, status, usage);
+        } catch (err) {
+          console.error('Fetch error:', err);
+          document.getElementById('error-box').style.display = 'block';
         }
       }
 
-      refreshDashboard();
-      setInterval(refreshDashboard, 5000);
+      // 初始加载
+      fetchData();
+
+      // 每 5 秒刷新
+      setInterval(fetchData, 5000);
     </script>
   </body>
 </html>
