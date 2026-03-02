@@ -476,12 +476,17 @@
 
         // 活动日志
         if (data.recent_activity && data.recent_activity.length > 0) {
-          document.getElementById('recent-activity').innerHTML = data.recent_activity.map(log => `
+          document.getElementById('recent-activity').innerHTML = data.recent_activity.map(log => {
+            const time = log.timestamp ? formatTime(log.timestamp) : '--';
+            const task = log.task || log.action || '未知操作';
+            return `
             <div class="log-item">
-              <div class="log-time">${formatTime(log.timestamp)}</div>
-              <div class="log-content">${log.task}</div>
-            </div>
-          `).join('');
+              <div class="log-time">${time}</div>
+              <div class="log-content">${task}</div>
+            </div>`;
+          }).join('');
+        } else {
+          document.getElementById('recent-activity').innerHTML = '<div style="color:var(--muted)">暂无活动日志</div>';
         }
 
         // 更新时间
