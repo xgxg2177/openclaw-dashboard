@@ -4,92 +4,479 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ title }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f5f8ee;
+        --panel: #ffffff;
+        --panel-soft: #f6f8ff;
+        --line: #d5ddcf;
+        --text: #1f2b16;
+        --muted: #5d6d4f;
+        --ok: #2a8f44;
+        --idle: #7c8733;
+        --warn: #aa4d2d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Noto Sans SC", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 10% 0%, #d5e8c2 0%, transparent 35%),
+          radial-gradient(circle at 85% 15%, #d3ecf4 0%, transparent 30%),
+          var(--bg);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px 28px;
+      }
+
+      .board {
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: color-mix(in srgb, var(--panel) 92%, transparent);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 22px 50px rgba(41, 57, 23, 0.11);
+        padding: 20px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .title {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+        letter-spacing: 0.02em;
+        font-size: 30px;
+      }
+
+      .status-chip {
+        border: 1px solid #bbc9ac;
+        border-radius: 999px;
+        background: #e6f5d4;
+        color: #24411e;
+        padding: 6px 12px;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--ok);
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 12px;
+        background: linear-gradient(135deg, var(--panel-soft), #ffffff);
+      }
+
+      .card-label {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .card-value {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 22px;
+        line-height: 1.15;
+        word-break: break-word;
+      }
+
+      .section-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+        background: #fff;
+      }
+
+      .panel h2 {
+        margin: 0 0 10px;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 18px;
+      }
+
+      .list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .row {
+        border: 1px solid #e6ebdf;
+        border-radius: 10px;
+        padding: 10px;
+        background: #fcfdfb;
+      }
+
+      .row-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 6px;
+      }
+
+      .row-title {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .tag {
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      .tag.active {
+        background: #daf1d9;
+        color: #1f6932;
+      }
+
+      .tag.idle {
+        background: #f3f2d5;
+        color: #7a6f20;
+      }
+
+      .tag.loaded {
+        background: #daf1d9;
+        color: #1f6932;
+      }
+
+      .tag.unloaded {
+        background: #f8ddcf;
+        color: #8b4428;
+      }
+
+      .meta {
+        margin: 2px 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .activity .row {
+        display: grid;
+        grid-template-columns: 84px 1fr;
+        gap: 8px;
+        align-items: start;
+      }
+
+      .time {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 12px;
+        color: #4a5a38;
+      }
+
+      .hint {
+        text-align: right;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      @media (max-width: 1000px) {
+        .cards {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .board {
+          padding: 14px;
+          border-radius: 16px;
+        }
+
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .title {
+          font-size: 24px;
+        }
+
+        .cards {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .section-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .activity .row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .cards {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
   </head>
-  <body class="min-h-screen bg-slate-100 text-slate-900">
-    <div class="relative min-h-screen overflow-hidden">
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.18),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(56,189,248,0.2),transparent_35%),linear-gradient(to_bottom,#f8fafc,#e2e8f0)]"></div>
-
-      <main class="relative mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-        <section class="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-xl backdrop-blur">
-          <header class="mb-6 flex items-center justify-between">
-            <h1 class="text-2xl font-bold tracking-tight text-slate-800 sm:text-3xl">{{ title }}</h1>
-            <div class="flex items-center gap-2 rounded-full bg-slate-900/90 px-3 py-1.5 text-sm text-white">
-              <span id="header-dot" class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
-              <span id="header-status">在线</span>
-            </div>
-          </header>
-
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <article class="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-5 shadow-sm">
-              <p class="text-sm font-medium text-emerald-700">运行状态</p>
-              <p id="status-value" class="mt-3 text-3xl font-semibold text-emerald-800">加载中...</p>
-            </article>
-
-            <article class="rounded-2xl border border-sky-200 bg-sky-50/80 p-5 shadow-sm">
-              <p class="text-sm font-medium text-sky-700">当前任务</p>
-              <p id="task-value" class="mt-3 text-xl font-semibold text-sky-900">加载中...</p>
-            </article>
-
-            <article class="rounded-2xl border border-amber-200 bg-amber-50/80 p-5 shadow-sm">
-              <p class="text-sm font-medium text-amber-700">活跃会话数</p>
-              <p id="sessions-value" class="mt-3 text-4xl font-bold text-amber-800">0</p>
-            </article>
-
-            <article class="rounded-2xl border border-indigo-200 bg-indigo-50/80 p-5 shadow-sm">
-              <p class="text-sm font-medium text-indigo-700">已加载技能数</p>
-              <p id="skills-value" class="mt-3 text-4xl font-bold text-indigo-800">0</p>
-            </article>
+  <body>
+    <main class="container">
+      <section class="board">
+        <header class="header">
+          <h1 class="title">{{ title }}</h1>
+          <div class="status-chip">
+            <span id="header-dot" class="dot"></span>
+            <span id="header-status">在线</span>
           </div>
+        </header>
 
-          <p class="mt-6 text-right text-xs text-slate-500">
-            自动刷新：每 5 秒
-            <span id="refresh-time" class="ml-2 font-medium text-slate-600">--:--:--</span>
-          </p>
+        <section class="cards">
+          <article class="card">
+            <div class="card-label">状态</div>
+            <div id="card-status" class="card-value">加载中...</div>
+          </article>
+          <article class="card">
+            <div class="card-label">任务</div>
+            <div id="card-task" class="card-value">加载中...</div>
+          </article>
+          <article class="card">
+            <div class="card-label">会话</div>
+            <div id="card-sessions" class="card-value">0 / 0</div>
+          </article>
+          <article class="card">
+            <div class="card-label">技能</div>
+            <div id="card-skills" class="card-value">0 / 0</div>
+          </article>
+          <article class="card">
+            <div class="card-label">Token</div>
+            <div id="card-token" class="card-value">0 / 0</div>
+          </article>
+          <article class="card">
+            <div class="card-label">模型</div>
+            <div id="card-model" class="card-value">-</div>
+          </article>
         </section>
-      </main>
-    </div>
+
+        <section class="section-grid">
+          <article class="panel">
+            <h2>会话列表</h2>
+            <div id="sessions-list" class="list"></div>
+          </article>
+
+          <article class="panel">
+            <h2>技能列表</h2>
+            <div id="skills-list" class="list"></div>
+          </article>
+        </section>
+
+        <section class="panel activity">
+          <h2>最近活动日志</h2>
+          <div id="activity-list" class="list"></div>
+        </section>
+
+        <p class="hint">
+          版本 <span id="version">-</span> · 运行时长 <span id="runtime">-</span> · 请求成功率
+          <span id="success-rate">0%</span> · 响应时间 <span id="response-time">0ms</span> · 自动刷新
+          <span id="refresh-time">--:--:--</span>
+        </p>
+      </section>
+    </main>
 
     <script>
       const els = {
-        status: document.getElementById("status-value"),
-        task: document.getElementById("task-value"),
-        sessions: document.getElementById("sessions-value"),
-        skills: document.getElementById("skills-value"),
         headerStatus: document.getElementById("header-status"),
         headerDot: document.getElementById("header-dot"),
+        status: document.getElementById("card-status"),
+        task: document.getElementById("card-task"),
+        sessions: document.getElementById("card-sessions"),
+        skills: document.getElementById("card-skills"),
+        token: document.getElementById("card-token"),
+        model: document.getElementById("card-model"),
+        version: document.getElementById("version"),
+        runtime: document.getElementById("runtime"),
+        successRate: document.getElementById("success-rate"),
+        responseTime: document.getElementById("response-time"),
         refreshTime: document.getElementById("refresh-time"),
+        sessionsList: document.getElementById("sessions-list"),
+        skillsList: document.getElementById("skills-list"),
+        activityList: document.getElementById("activity-list"),
       };
-
-      function setStatusUI(status) {
-        const online = status === "online";
-        els.status.textContent = online ? "在线" : "离线";
-        els.headerStatus.textContent = online ? "在线" : "离线";
-        els.headerDot.className = `h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400" : "bg-rose-400"}`;
-      }
 
       function formatTime(date) {
         return date.toLocaleTimeString("zh-CN", { hour12: false });
       }
 
+      function formatDateTime(value) {
+        if (!value) return "-";
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.valueOf())) return String(value);
+        return parsed.toLocaleString("zh-CN", { hour12: false });
+      }
+
+      function formatRuntime(seconds) {
+        const total = Math.max(Number(seconds || 0), 0);
+        const h = Math.floor(total / 3600);
+        const m = Math.floor((total % 3600) / 60);
+        const s = total % 60;
+        return `${h}h ${m}m ${s}s`;
+      }
+
+      function setStatus(status) {
+        const online = status === "online";
+        els.headerStatus.textContent = online ? "在线" : "离线";
+        els.status.textContent = online ? "在线" : "离线";
+        els.headerDot.style.background = online ? "var(--ok)" : "var(--warn)";
+      }
+
+      function renderSessions(sessions) {
+        if (!Array.isArray(sessions) || sessions.length === 0) {
+          els.sessionsList.innerHTML = '<div class="meta">暂无会话数据</div>';
+          return;
+        }
+
+        els.sessionsList.innerHTML = sessions
+          .map((session) => {
+            const sessionStatus = session.status === "active" ? "active" : "idle";
+            const statusText = sessionStatus === "active" ? "活跃" : "空闲";
+            return `
+              <article class="row">
+                <div class="row-head">
+                  <p class="row-title">${session.title || "Untitled Session"}</p>
+                  <span class="tag ${sessionStatus}">${statusText}</span>
+                </div>
+                <p class="meta">ID: ${session.id || "-"}</p>
+                <p class="meta">创建时间: ${formatDateTime(session.created_at)}</p>
+                <p class="meta">最后活动: ${formatDateTime(session.last_activity_at)}</p>
+                <p class="meta">消息数量: ${Number(session.message_count ?? 0)}</p>
+              </article>
+            `;
+          })
+          .join("");
+      }
+
+      function renderSkills(skills) {
+        if (!Array.isArray(skills) || skills.length === 0) {
+          els.skillsList.innerHTML = '<div class="meta">暂无技能数据</div>';
+          return;
+        }
+
+        els.skillsList.innerHTML = skills
+          .map((skill) => {
+            const loaded = Boolean(skill.loaded);
+            return `
+              <article class="row">
+                <div class="row-head">
+                  <p class="row-title">${skill.name || "unknown-skill"}</p>
+                  <span class="tag ${loaded ? "loaded" : "unloaded"}">${loaded ? "已加载" : "未加载"}</span>
+                </div>
+                <p class="meta">描述: ${skill.description || "No description"}</p>
+                <p class="meta">来源: ${skill.source || "builtin"}</p>
+              </article>
+            `;
+          })
+          .join("");
+      }
+
+      function renderActivity(activities) {
+        if (!Array.isArray(activities) || activities.length === 0) {
+          els.activityList.innerHTML = '<div class="meta">暂无活动日志</div>';
+          return;
+        }
+
+        els.activityList.innerHTML = activities
+          .map(
+            (item) => `
+            <article class="row">
+              <div class="time">${formatDateTime(item.timestamp)}</div>
+              <div>
+                <p class="meta"><strong>${item.type || "unknown"}</strong> · ${item.action || "unknown"}</p>
+                <p class="meta">${item.detail || ""}</p>
+              </div>
+            </article>
+          `,
+          )
+          .join("");
+      }
+
+      function resetOnError() {
+        setStatus("offline");
+        els.task.textContent = "数据获取失败";
+        els.sessions.textContent = "0 / 0";
+        els.skills.textContent = "0 / 0";
+        els.token.textContent = "0 / 0";
+        els.model.textContent = "-";
+        els.version.textContent = "-";
+        els.runtime.textContent = "-";
+        els.successRate.textContent = "0%";
+        els.responseTime.textContent = "0ms";
+        renderSessions([]);
+        renderSkills([]);
+        renderActivity([]);
+      }
+
       async function refreshDashboard() {
         try {
           const res = await fetch("/api/dashboard", { cache: "no-store" });
-          if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
-          }
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
           const data = await res.json();
-          setStatusUI(data.status || "offline");
+          setStatus(data.status || "offline");
+
+          const summary = data.summary || {};
+          const tokenUsage = data.token_usage || {};
+          const metrics = data.metrics || {};
+
           els.task.textContent = data.current_task || "暂无任务";
-          els.sessions.textContent = String(data.active_sessions ?? 0);
-          els.skills.textContent = String(data.loaded_skills ?? 0);
+          els.sessions.textContent = `${summary.active_sessions ?? 0} / ${summary.total_sessions ?? 0}`;
+          els.skills.textContent = `${summary.loaded_skills ?? 0} / ${summary.total_skills ?? 0}`;
+          els.token.textContent = `${tokenUsage.used ?? 0} / ${tokenUsage.limit ?? 0}`;
+          els.model.textContent = data.model || "unknown";
+          els.version.textContent = data.version || "v0.0.0";
+          els.runtime.textContent = formatRuntime(data.runtime_seconds || 0);
+          els.successRate.textContent = `${Number(metrics.request_success_rate ?? 0).toFixed(1)}%`;
+          els.responseTime.textContent = `${Number(metrics.response_time_ms ?? 0)}ms`;
+
+          renderSessions(data.sessions || []);
+          renderSkills(data.skills || []);
+          renderActivity(data.recent_activity || []);
           els.refreshTime.textContent = formatTime(new Date());
         } catch (error) {
-          setStatusUI("offline");
-          els.task.textContent = "数据获取失败";
-          els.sessions.textContent = "0";
-          els.skills.textContent = "0";
+          resetOnError();
           els.refreshTime.textContent = `${formatTime(new Date())} (错误)`;
           console.error("Failed to refresh dashboard:", error);
         }
