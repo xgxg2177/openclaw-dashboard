@@ -56,6 +56,28 @@ class MockOpenClawProvider:
                 "created_at": (now - timedelta(hours=5, minutes=35)).isoformat(timespec="seconds"),
                 "last_activity_at": (now - timedelta(minutes=2)).isoformat(timespec="seconds"),
                 "message_count": 48,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "请帮我确认 Dashboard 的会话数据结构。",
+                        "timestamp": (now - timedelta(minutes=20)).isoformat(timespec="seconds"),
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "已确认，当前包含 id、title、status、created_at、last_activity_at、message_count。",
+                        "timestamp": (now - timedelta(minutes=18)).isoformat(timespec="seconds"),
+                    },
+                    {
+                        "role": "user",
+                        "content": "继续实现会话详情弹窗。",
+                        "timestamp": (now - timedelta(minutes=9)).isoformat(timespec="seconds"),
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "正在实现点击卡片弹窗并展示最近消息列表。",
+                        "timestamp": (now - timedelta(minutes=2)).isoformat(timespec="seconds"),
+                    },
+                ],
             },
             {
                 "id": "sess-002",
@@ -64,6 +86,18 @@ class MockOpenClawProvider:
                 "created_at": (now - timedelta(hours=17)).isoformat(timespec="seconds"),
                 "last_activity_at": (now - timedelta(hours=1, minutes=12)).isoformat(timespec="seconds"),
                 "message_count": 21,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "生产环境有一个空指针报错。",
+                        "timestamp": (now - timedelta(hours=2, minutes=10)).isoformat(timespec="seconds"),
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "定位在 usage 统计字段为空时的分支，已补充空值处理。",
+                        "timestamp": (now - timedelta(hours=1, minutes=12)).isoformat(timespec="seconds"),
+                    },
+                ],
             },
             {
                 "id": "sess-003",
@@ -72,6 +106,18 @@ class MockOpenClawProvider:
                 "created_at": (now - timedelta(hours=2, minutes=9)).isoformat(timespec="seconds"),
                 "last_activity_at": (now - timedelta(minutes=8)).isoformat(timespec="seconds"),
                 "message_count": 12,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "请整理本周发布说明草稿。",
+                        "timestamp": (now - timedelta(hours=1, minutes=1)).isoformat(timespec="seconds"),
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "已整理新增功能、修复项和已知问题列表。",
+                        "timestamp": (now - timedelta(minutes=8)).isoformat(timespec="seconds"),
+                    },
+                ],
             },
         ]
 
@@ -587,6 +633,25 @@ class OpenClawAPI:
         for session in sessions:
             if not isinstance(session, dict):
                 continue
+            messages: list[dict[str, Any]] = []
+            raw_messages = session.get("messages")
+            if isinstance(raw_messages, list):
+                for raw in raw_messages[-10:]:
+                    if isinstance(raw, dict):
+                        role = str(raw.get("role") or "assistant")
+                        content = str(raw.get("content") or "")
+                        timestamp = raw.get("timestamp")
+                    else:
+                        role = "assistant"
+                        content = str(raw)
+                        timestamp = None
+                    messages.append(
+                        {
+                            "role": role,
+                            "content": content,
+                            "timestamp": timestamp,
+                        }
+                    )
             result.append(
                 {
                     "id": str(session.get("id", "")),
@@ -595,6 +660,7 @@ class OpenClawAPI:
                     "created_at": session.get("created_at"),
                     "last_activity_at": session.get("last_activity_at"),
                     "message_count": int(session.get("message_count", 0) or 0),
+                    "messages": messages,
                 }
             )
         return result

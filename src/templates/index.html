@@ -257,6 +257,106 @@
         opacity: 0.6;
         pointer-events: none;
       }
+
+      .session-card {
+        cursor: pointer;
+        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      }
+
+      .session-card:hover {
+        border-color: #9fb48a;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(41, 57, 23, 0.08);
+      }
+
+      .session-dialog {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--panel);
+        color: var(--text);
+        width: min(740px, calc(100vw - 24px));
+        padding: 0;
+      }
+
+      .session-dialog::backdrop {
+        background: rgba(18, 26, 12, 0.38);
+      }
+
+      .session-dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .session-dialog-title {
+        margin: 0;
+        font-size: 18px;
+        font-family: "Space Grotesk", sans-serif;
+      }
+
+      .session-dialog-close {
+        border: 1px solid var(--line);
+        background: var(--panel-soft);
+        color: var(--text);
+        border-radius: 999px;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+      }
+
+      .session-dialog-body {
+        padding: 14px 16px 16px;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px 14px;
+        margin-bottom: 12px;
+        font-size: 12px;
+      }
+
+      .detail-label {
+        color: var(--muted);
+        margin-right: 6px;
+      }
+
+      .message-list {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel-soft);
+        padding: 10px;
+      }
+
+      .message-item {
+        padding: 8px;
+        border-radius: 8px;
+        background: var(--panel);
+        border: 1px solid #e1e8d8;
+        margin-bottom: 8px;
+      }
+
+      .message-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .message-meta {
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+
+      .message-content {
+        font-size: 12px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
     </style>
   </head>
   <body>
@@ -378,7 +478,21 @@
       </div>
     </div>
 
+    <dialog id="session-dialog" class="session-dialog">
+      <div class="session-dialog-header">
+        <h3 class="session-dialog-title" id="session-dialog-title">会话详情</h3>
+        <button type="button" class="session-dialog-close" id="session-dialog-close" aria-label="关闭">×</button>
+      </div>
+      <div class="session-dialog-body">
+        <div class="detail-grid" id="session-detail-grid"></div>
+        <div class="section-title" style="margin-bottom:8px">最近 10 条消息</div>
+        <div class="message-list" id="session-message-list"></div>
+      </div>
+    </dialog>
+
     <script>
+      let sessionsById = {};
+
       function formatTime(iso) {
         if (!iso) return '--';
         const d = new Date(iso);
@@ -397,6 +511,46 @@
 
       function formatCurrency(num) {
         return '$' + num.toFixed(2);
+      }
+
+      function escapeHtml(text) {
+        return String(text)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function openSessionDialog(sessionId) {
+        const dialog = document.getElementById('session-dialog');
+        const session = sessionsById[sessionId];
+        if (!dialog || !session) return;
+
+        document.getElementById('session-dialog-title').textContent = session.title || '会话详情';
+        document.getElementById('session-detail-grid').innerHTML = `
+          <div><span class="detail-label">ID:</span>${escapeHtml(session.id || '--')}</div>
+          <div><span class="detail-label">状态:</span>${session.status === 'active' ? '活跃' : '空闲'}</div>
+          <div><span class="detail-label">创建时间:</span>${formatTime(session.created_at)}</div>
+          <div><span class="detail-label">最后活动:</span>${formatTime(session.last_activity_at)}</div>
+          <div><span class="detail-label">消息数:</span>${formatNumber(session.message_count || 0)}</div>
+          <div><span class="detail-label">标题:</span>${escapeHtml(session.title || '--')}</div>
+        `;
+
+        const messages = Array.isArray(session.messages) ? session.messages.slice(-10) : [];
+        const messageList = document.getElementById('session-message-list');
+        if (!messages.length) {
+          messageList.innerHTML = '<div class="message-meta">暂无消息</div>';
+        } else {
+          messageList.innerHTML = messages.map(msg => `
+            <div class="message-item">
+              <div class="message-meta">${escapeHtml(msg.role || 'assistant')} · ${formatTime(msg.timestamp)}</div>
+              <div class="message-content">${escapeHtml(msg.content || '')}</div>
+            </div>
+          `).join('');
+        }
+
+        dialog.showModal();
       }
 
       function updateUI(data, status, usage, aiStatus) {
@@ -469,8 +623,12 @@
 
         // 会话列表
         if (data.sessions && data.sessions.length > 0) {
+          sessionsById = data.sessions.reduce((acc, session) => {
+            if (session && session.id) acc[session.id] = session;
+            return acc;
+          }, {});
           document.getElementById('sessions-list').innerHTML = data.sessions.map(s => `
-            <div class="item">
+            <div class="item session-card" data-session-id="${s.id}">
               <div class="item-title">${s.title}</div>
               <div class="item-meta">
                 <div>ID: ${s.id}</div>
@@ -553,6 +711,23 @@
 
       // 每 5 秒刷新
       setInterval(fetchData, 5000);
+
+      document.getElementById('sessions-list').addEventListener('click', (event) => {
+        const card = event.target.closest('[data-session-id]');
+        if (!card) return;
+        openSessionDialog(card.dataset.sessionId);
+      });
+
+      document.getElementById('session-dialog-close').addEventListener('click', () => {
+        document.getElementById('session-dialog').close();
+      });
+
+      document.getElementById('session-dialog').addEventListener('click', (event) => {
+        const dialog = document.getElementById('session-dialog');
+        if (event.target === dialog) {
+          dialog.close();
+        }
+      });
     </script>
   </body>
 </html>

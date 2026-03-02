@@ -138,7 +138,7 @@ class OpenClawAPITestCase(unittest.TestCase):
         self.assertIsInstance(sessions, list)
         self.assertTrue(sessions)
         self.assertTrue(
-            {"id", "title", "status", "created_at", "last_activity_at", "message_count"}.issubset(
+            {"id", "title", "status", "created_at", "last_activity_at", "message_count", "messages"}.issubset(
                 sessions[0].keys(),
             )
         )
@@ -181,6 +181,7 @@ class OpenClawAPITestCase(unittest.TestCase):
                     "created_at": "2026-03-02T11:00:00",
                     "last_activity_at": "2026-03-02T11:10:00",
                     "message_count": 8,
+                    "messages": [],
                 }
             ],
         )
