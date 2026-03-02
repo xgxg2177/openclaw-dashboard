@@ -290,6 +290,50 @@
             <div class="card-label">模型</div>
             <div id="card-model" class="card-value">-</div>
           </article>
+          <article class="card">
+            <div class="card-label">开始时间</div>
+            <div id="card-started-at" class="card-value">-</div>
+          </article>
+          <article class="card">
+            <div class="card-label">进度</div>
+            <div id="card-progress" class="card-value">0%</div>
+          </article>
+        </section>
+
+        <section class="section-grid">
+          <article class="panel">
+            <h2>工作状态</h2>
+            <div class="list">
+              <div class="row">
+                <p class="meta">当前状态: <strong id="work-status">-</strong></p>
+                <p class="meta">当前任务: <strong id="work-task">-</strong></p>
+                <p class="meta">开始时间: <span id="work-started-at">-</span></p>
+                <p class="meta">任务进度: <span id="work-progress">0%</span></p>
+                <p class="meta">最后更新: <span id="work-last-update">-</span></p>
+              </div>
+            </div>
+            <div id="work-activity-list" class="list"></div>
+          </article>
+
+          <article class="panel">
+            <h2>用量统计</h2>
+            <div class="list">
+              <div class="row">
+                <p class="meta"><strong>Codex CLI</strong></p>
+                <p class="meta">今日会话: <span id="codex-sessions">0</span></p>
+                <p class="meta">今日 Token: <span id="codex-tokens">0</span></p>
+                <p class="meta">Rate Limit: <span id="codex-rate-limit">-</span></p>
+              </div>
+              <div class="row">
+                <p class="meta"><strong>OpenClaw API</strong></p>
+                <p class="meta">今日调用: <span id="api-calls">0</span></p>
+                <p class="meta">输入 Token: <span id="api-token-in">0</span></p>
+                <p class="meta">输出 Token: <span id="api-token-out">0</span></p>
+                <p class="meta">成本: $<span id="api-cost">0.000000</span></p>
+              </div>
+            </div>
+            <div id="usage-recent-list" class="list"></div>
+          </article>
         </section>
 
         <section class="section-grid">
@@ -327,6 +371,22 @@
         skills: document.getElementById("card-skills"),
         token: document.getElementById("card-token"),
         model: document.getElementById("card-model"),
+        startedAt: document.getElementById("card-started-at"),
+        progress: document.getElementById("card-progress"),
+        workStatus: document.getElementById("work-status"),
+        workTask: document.getElementById("work-task"),
+        workStartedAt: document.getElementById("work-started-at"),
+        workProgress: document.getElementById("work-progress"),
+        workLastUpdate: document.getElementById("work-last-update"),
+        workActivityList: document.getElementById("work-activity-list"),
+        codexSessions: document.getElementById("codex-sessions"),
+        codexTokens: document.getElementById("codex-tokens"),
+        codexRateLimit: document.getElementById("codex-rate-limit"),
+        apiCalls: document.getElementById("api-calls"),
+        apiTokenIn: document.getElementById("api-token-in"),
+        apiTokenOut: document.getElementById("api-token-out"),
+        apiCost: document.getElementById("api-cost"),
+        usageRecentList: document.getElementById("usage-recent-list"),
         version: document.getElementById("version"),
         runtime: document.getElementById("runtime"),
         successRate: document.getElementById("success-rate"),
@@ -357,10 +417,28 @@
       }
 
       function setStatus(status) {
-        const online = status === "online";
-        els.headerStatus.textContent = online ? "在线" : "离线";
-        els.status.textContent = online ? "在线" : "离线";
-        els.headerDot.style.background = online ? "var(--ok)" : "var(--warn)";
+        const normalized = String(status || "idle").toLowerCase();
+        const statusMap = {
+          online: "在线",
+          offline: "离线",
+          working: "工作中",
+          idle: "空闲",
+          thinking: "思考中",
+          executing: "执行中",
+        };
+        const colorMap = {
+          online: "var(--ok)",
+          offline: "var(--warn)",
+          working: "var(--ok)",
+          idle: "var(--idle)",
+          thinking: "#2f7596",
+          executing: "#2d5baa",
+        };
+        const text = statusMap[normalized] || "空闲";
+        els.headerStatus.textContent = text;
+        els.status.textContent = text;
+        els.workStatus.textContent = text;
+        els.headerDot.style.background = colorMap[normalized] || "var(--idle)";
       }
 
       function renderSessions(sessions) {
@@ -433,47 +511,169 @@
           .join("");
       }
 
+      function renderWorkActivity(activities) {
+        if (!Array.isArray(activities) || activities.length === 0) {
+          els.workActivityList.innerHTML = '<div class="meta">暂无工作活动日志</div>';
+          return;
+        }
+
+        els.workActivityList.innerHTML = activities
+          .map(
+            (item) => `
+            <article class="row">
+              <p class="meta"><strong>${item.type || "info"}</strong> · ${formatDateTime(item.timestamp)}</p>
+              <p class="meta">${item.message || ""}</p>
+            </article>
+          `,
+          )
+          .join("");
+      }
+
+      function renderUsageRecent(codexCalls, apiCalls) {
+        const codexRows = Array.isArray(codexCalls) ? codexCalls.slice(0, 5) : [];
+        const apiRows = Array.isArray(apiCalls) ? apiCalls.slice(0, 5) : [];
+        const rows = [];
+
+        for (const item of codexRows) {
+          rows.push(`
+            <article class="row">
+              <p class="meta"><strong>Codex</strong> · ${formatDateTime(item.timestamp)}</p>
+              <p class="meta">${item.task || "tool_call"} · Token ${Number(item.token_usage || 0)}</p>
+            </article>
+          `);
+        }
+
+        for (const item of apiRows) {
+          rows.push(`
+            <article class="row">
+              <p class="meta"><strong>OpenClaw API</strong> · ${formatDateTime(item.timestamp)}</p>
+              <p class="meta">${item.endpoint || "unknown"} · in ${Number(item.token_input || 0)} / out ${Number(item.token_output || 0)} · $${Number(item.cost_usd || 0).toFixed(6)}</p>
+            </article>
+          `);
+        }
+
+        if (rows.length === 0) {
+          els.usageRecentList.innerHTML = '<div class="meta">暂无调用记录</div>';
+          return;
+        }
+
+        els.usageRecentList.innerHTML = rows.join("");
+      }
+
+      function renderWorkStatus(data) {
+        const progressValue = Number(data.progress ?? 0);
+        const progress = Number.isFinite(progressValue) ? Math.max(0, Math.min(100, progressValue)) : 0;
+        setStatus(data.status || "idle");
+        els.task.textContent = data.current_task || "暂无任务";
+        els.workTask.textContent = data.current_task || "暂无任务";
+        els.startedAt.textContent = formatDateTime(data.started_at);
+        els.progress.textContent = `${progress}%`;
+        els.workStartedAt.textContent = formatDateTime(data.started_at);
+        els.workProgress.textContent = `${progress}%`;
+        els.workLastUpdate.textContent = formatDateTime(data.last_update);
+        renderWorkActivity(data.activity_log || []);
+      }
+
+      function renderUsage(data) {
+        const codex = data.codex || {};
+        const api = data.openclaw_api || {};
+        const rate = codex.rate_limit || {};
+        const rateText =
+          rate.primary_used_percent == null ? "-" : `${Number(rate.primary_used_percent || 0).toFixed(1)}%`;
+
+        els.codexSessions.textContent = `${Number(codex.today_sessions ?? 0)}`;
+        els.codexTokens.textContent = `${Number(codex.today_token_usage ?? 0)}`;
+        els.codexRateLimit.textContent = rateText;
+        els.apiCalls.textContent = `${Number(api.today_calls ?? 0)}`;
+        els.apiTokenIn.textContent = `${Number(api.token_input ?? 0)}`;
+        els.apiTokenOut.textContent = `${Number(api.token_output ?? 0)}`;
+        els.apiCost.textContent = Number(api.cost_usd ?? 0).toFixed(6);
+
+        renderUsageRecent(codex.recent_calls || [], api.recent_calls || []);
+      }
+
+      async function fetchJson(url) {
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+        return res.json();
+      }
+
       function resetOnError() {
         setStatus("offline");
         els.task.textContent = "数据获取失败";
+        els.workTask.textContent = "数据获取失败";
         els.sessions.textContent = "0 / 0";
         els.skills.textContent = "0 / 0";
         els.token.textContent = "0 / 0";
         els.model.textContent = "-";
+        els.startedAt.textContent = "-";
+        els.progress.textContent = "0%";
+        els.workStartedAt.textContent = "-";
+        els.workProgress.textContent = "0%";
+        els.workLastUpdate.textContent = "-";
         els.version.textContent = "-";
         els.runtime.textContent = "-";
         els.successRate.textContent = "0%";
         els.responseTime.textContent = "0ms";
+        els.codexSessions.textContent = "0";
+        els.codexTokens.textContent = "0";
+        els.codexRateLimit.textContent = "-";
+        els.apiCalls.textContent = "0";
+        els.apiTokenIn.textContent = "0";
+        els.apiTokenOut.textContent = "0";
+        els.apiCost.textContent = "0.000000";
         renderSessions([]);
         renderSkills([]);
         renderActivity([]);
+        renderWorkActivity([]);
+        renderUsageRecent([], []);
       }
 
       async function refreshDashboard() {
         try {
-          const res = await fetch("/api/dashboard", { cache: "no-store" });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const [dashboardResult, statusResult, usageResult] = await Promise.allSettled([
+            fetchJson("/api/dashboard"),
+            fetchJson("/api/status"),
+            fetchJson("/api/usage"),
+          ]);
 
-          const data = await res.json();
-          setStatus(data.status || "offline");
+          const dashboardData = dashboardResult.status === "fulfilled" ? dashboardResult.value : null;
+          const statusData = statusResult.status === "fulfilled" ? statusResult.value : null;
+          const usageData = usageResult.status === "fulfilled" ? usageResult.value : null;
 
-          const summary = data.summary || {};
-          const tokenUsage = data.token_usage || {};
-          const metrics = data.metrics || {};
+          if (!dashboardData && !statusData && !usageData) {
+            throw new Error("All API requests failed");
+          }
 
-          els.task.textContent = data.current_task || "暂无任务";
-          els.sessions.textContent = `${summary.active_sessions ?? 0} / ${summary.total_sessions ?? 0}`;
-          els.skills.textContent = `${summary.loaded_skills ?? 0} / ${summary.total_skills ?? 0}`;
-          els.token.textContent = `${tokenUsage.used ?? 0} / ${tokenUsage.limit ?? 0}`;
-          els.model.textContent = data.model || "unknown";
-          els.version.textContent = data.version || "v0.0.0";
-          els.runtime.textContent = formatRuntime(data.runtime_seconds || 0);
-          els.successRate.textContent = `${Number(metrics.request_success_rate ?? 0).toFixed(1)}%`;
-          els.responseTime.textContent = `${Number(metrics.response_time_ms ?? 0)}ms`;
+          if (statusData) {
+            renderWorkStatus(statusData);
+          } else if (dashboardData) {
+            setStatus(dashboardData.status || "online");
+          }
 
-          renderSessions(data.sessions || []);
-          renderSkills(data.skills || []);
-          renderActivity(data.recent_activity || []);
+          if (dashboardData) {
+            const summary = dashboardData.summary || {};
+            const tokenUsage = dashboardData.token_usage || {};
+            const metrics = dashboardData.metrics || {};
+
+            els.sessions.textContent = `${summary.active_sessions ?? 0} / ${summary.total_sessions ?? 0}`;
+            els.skills.textContent = `${summary.loaded_skills ?? 0} / ${summary.total_skills ?? 0}`;
+            els.token.textContent = `${tokenUsage.used ?? 0} / ${tokenUsage.limit ?? 0}`;
+            els.model.textContent = dashboardData.model || "unknown";
+            els.version.textContent = dashboardData.version || "v0.0.0";
+            els.runtime.textContent = formatRuntime(dashboardData.runtime_seconds || 0);
+            els.successRate.textContent = `${Number(metrics.request_success_rate ?? 0).toFixed(1)}%`;
+            els.responseTime.textContent = `${Number(metrics.response_time_ms ?? 0)}ms`;
+
+            renderSessions(dashboardData.sessions || []);
+            renderSkills(dashboardData.skills || []);
+            renderActivity(dashboardData.recent_activity || []);
+          }
+
+          if (usageData) {
+            renderUsage(usageData);
+          }
+
           els.refreshTime.textContent = formatTime(new Date());
         } catch (error) {
           resetOnError();

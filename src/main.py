@@ -6,7 +6,16 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from .openclaw_api import get_config, get_metrics, get_recent_activity, get_sessions, get_skills, get_status
+from .openclaw_api import (
+    get_config,
+    get_metrics,
+    get_recent_activity,
+    get_sessions,
+    get_skills,
+    get_status,
+    get_usage,
+    get_work_status,
+)
 
 app = FastAPI(title="OpenClaw Dashboard")
 
@@ -66,3 +75,13 @@ async def dashboard_data() -> dict[str, Any]:
         "recent_activity": recent_activity,
         "metrics": metrics,
     }
+
+
+@app.get("/api/status")
+async def status_data() -> dict[str, Any]:
+    return get_work_status()
+
+
+@app.get("/api/usage")
+async def usage_data() -> dict[str, Any]:
+    return get_usage()
